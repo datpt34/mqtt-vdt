@@ -41,8 +41,9 @@ func main() {
 func publish(client mqtt.Client) {
 	num := 10
 	for i := 0; i < num; i++ {
+		//token := client.Publish("topic/test", 0, true, []byte{})
 		text := fmt.Sprintf("Message %d", i)
-		token := client.Publish("topic/test", 0, false, text)
+		token := client.Publish("topic/test", 0, true, text)
 		token.Wait()
 		time.Sleep(time.Second)
 	}
