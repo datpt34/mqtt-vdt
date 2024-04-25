@@ -30,13 +30,13 @@ func main() {
 	opts.SetDefaultPublishHandler(messagePubHandler)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
+	opts.SetWill("topic/will", "Client Disconnect", 0, false)
 	client := mqtt.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
 	sub(client)
 	publish(client)
-	client.Disconnect(250)
 }
 func publish(client mqtt.Client) {
 	num := 10
