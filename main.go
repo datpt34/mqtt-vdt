@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"time"
 )
 
 const HOST = "mqttvcloud.innoway.vn"
@@ -29,9 +30,28 @@ func main() {
 	opts.SetDefaultPublishHandler(messagePubHandler)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
+	opts.SetWill("topic/will", "Client Disconnect", 0, false)
 	client := mqtt.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
-	client.Disconnect(250)
+	sub(client)
+	publish(client)
+}
+func publish(client mqtt.Client) {
+	num := 10
+	for i := 0; i < num; i++ {
+		//token := client.Publish("topic/test", 0, true, []byte{})
+		text := fmt.Sprintf("Message %d", i)
+		token := client.Publish("topic/test", 0, true, text)
+		token.Wait()
+		time.Sleep(time.Second)
+	}
+}
+
+func sub(client mqtt.Client) {
+	topic := "topic/test"
+	token := client.Subscribe(topic, 1, nil)
+	token.Wait()
+	fmt.Printf("Subscribed to topic: %s", topic)
 }
